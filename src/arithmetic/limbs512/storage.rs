@@ -23,7 +23,7 @@ use crate::{
     polyfill::StartPtr,
 };
 use core::{
-    mem::{align_of, size_of, MaybeUninit},
+    mem::{MaybeUninit, align_of, size_of},
     num::NonZero,
     ptr,
 };
@@ -38,7 +38,7 @@ use core::{
 pub struct AlignedStorage<const N: usize>([MaybeUninit<Limb>; N]);
 
 const _LIMB_SIZE_DIVIDES_ALIGNMENT: () =
-    assert!(align_of::<AlignedStorage<1>>() % size_of::<Limb>() == 0);
+    assert!(align_of::<AlignedStorage<1>>().is_multiple_of(size_of::<Limb>()));
 
 impl<const N: usize> AlignedStorage<N> {
     pub fn uninit() -> Self {

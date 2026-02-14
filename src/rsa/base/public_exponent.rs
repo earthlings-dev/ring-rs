@@ -1,5 +1,5 @@
 use crate::error;
-use crate::polyfill::{unwrap_const, ArrayFlatMap, LeadingZerosStripped};
+use crate::polyfill::{ArrayFlatMap, LeadingZerosStripped, unwrap_const};
 use core::num::NonZero;
 
 /// The exponent `e` of an RSA public key.

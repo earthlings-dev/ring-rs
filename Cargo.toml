@@ -2,16 +2,12 @@
 build = "build.rs"
 categories = ["cryptography", "no-std"]
 description = "An experiment."
-edition = "2021"
+edition.workspace = true
 keywords = ["crypto", "cryptography", "rand", "ECC", "RSA"]
 license = "Apache-2.0 AND ISC"
 name = "ring"
 repository = "https://github.com/briansmith/ring"
-
-# Keep in sync with .github/workflows/ci.yml ("MSRV") and see the MSRV note
-# in cpu/arm.rs.
-# 1.66 is required on x86/x86_64 for https://github.com/rust-lang/rust/pull/101861.
-rust-version = "1.83.0"
+rust-version.workspace = true
 
 # Keep in sync with `links` below.
 version = "0.17.14"
@@ -152,30 +148,29 @@ all-features = true
 name = "ring"
 
 [dependencies]
-cfg-if = { version = "1.0.0", default-features = false }
-getrandom = { version = "0.2.10" }
-untrusted = { version = "0.9" }
+cfg-if = { workspace = true }
+getrandom = { workspace = true }
+untrusted = { workspace = true }
 
 [target.'cfg(all(any(all(target_arch = "aarch64", target_endian = "little"), all(target_arch = "arm", target_endian = "little")), any(target_os = "android", target_os = "linux")))'.dependencies]
-libc = { version = "0.2.172", default-features = false }
+libc = { workspace = true }
 
 [target.'cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_vendor = "apple", any(target_os = "ios", target_os = "macos", target_os = "tvos", target_os = "visionos", target_os = "watchos")))'.dependencies]
-libc = { version = "0.2.172", default-features = false }
+libc = { workspace = true }
 
 [target.'cfg(all(all(target_arch = "aarch64", target_endian = "little"), target_os = "windows"))'.dependencies]
-windows-sys = { version = "0.60", features = ["Win32_Foundation", "Win32_System_Threading"] }
+windows-sys = { workspace = true }
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dev-dependencies]
-wasm-bindgen-test = { version = "0.3.37", default-features = false, features = ["std"] }
+wasm-bindgen-test = { workspace = true }
 
 [target.'cfg(any(unix, windows, target_os = "wasi"))'.dev-dependencies]
-libc = { version = "0.2.172", default-features = false }
+libc = { workspace = true }
 
 [build-dependencies]
-cc = { version = "1.2.8", default-features = false }
+cc = { workspace = true }
 
 [features]
-# These features are documented in the top-level module's documentation.
 default = ["alloc", "dev_urandom_fallback"]
 alloc = []
 dev_urandom_fallback = []
@@ -186,7 +181,7 @@ std = ["alloc"]
 unstable-testing-arm-no-hw = []
 unstable-testing-arm-no-neon = []
 test_logging = []
-wasm32_unknown_unknown_js = ["getrandom/js"]
+wasm32_unknown_unknown_js = ["getrandom/wasm_js"]
 
 [package.metadata.cargo-semver-checks.lints]
 trait_marked_deprecated = { level = "warn" }
@@ -194,7 +189,7 @@ function_marked_deprecated = { level = "warn" }
 global_value_marked_deprecated = { level = "warn" }
 trait_method_marked_deprecated = { level = "warn" }
 type_method_marked_deprecated = { level = "warn" }
-ype_associated_const_deprecated = { level = "warn" }
+type_associated_const_deprecated = { level = "warn" }
 trait_associated_type_marked_deprecated = { level = "warn" }
 trait_associated_const_marked_deprecated = { level = "warn" }
 enum_variant_marked_deprecated = { level = "warn" }
@@ -236,3 +231,21 @@ default-members = [
     ".",
     "cavp"
 ]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.93"
+
+[workspace.dependencies]
+cc = { version = "1.2.56", default-features = false }
+cfg-if = { version = "1.0.4", default-features = false }
+criterion = { version = "0.8.2", default-features = false }
+getrandom = { version = "0.4.1" }
+libc = { version = "0.2.182", default-features = false }
+ring = { path = ".", version = "0.17.14" }
+untrusted = { version = "0.9" }
+wasm-bindgen-test = { version = "0.3.58", default-features = false, features = ["std"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading"] }
+
+[patch.crates-io]
+getrandom = { git = "https://github.com/earthlings-dev/getrandom.git" }

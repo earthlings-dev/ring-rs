@@ -13,16 +13,17 @@
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #![allow(missing_docs)]
 
-use criterion::{black_box, criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use ring::{
     agreement::{self, EphemeralPrivateKey, UnparsedPublicKey},
     rand,
 };
+use std::hint::black_box;
 
 static ALGORITHMS: &[(&str, &agreement::Algorithm)] = &[
     ("p256", &agreement::ECDH_P256),
-    ("p384", &&agreement::ECDH_P384),
-    ("x25519", &&agreement::X25519),
+    ("p384", &agreement::ECDH_P384),
+    ("x25519", &agreement::X25519),
 ];
 
 fn generate_key(c: &mut Criterion) {
@@ -55,8 +56,7 @@ fn agree_ephemeral(c: &mut Criterion) {
         c.bench_function(&bench_name(alg_name, "agree_ephemeral"), |b| {
             let rng = rand::SystemRandom::new();
             let peer_public_key = {
-                let peer_private_key =
-                    agreement::EphemeralPrivateKey::generate(&alg, &rng).unwrap();
+                let peer_private_key = agreement::EphemeralPrivateKey::generate(alg, &rng).unwrap();
                 peer_private_key.compute_public_key().unwrap()
             };
             let peer_public_key: &[u8] = peer_public_key.as_ref();

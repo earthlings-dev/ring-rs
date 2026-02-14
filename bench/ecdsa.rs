@@ -13,11 +13,12 @@
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #![allow(missing_docs)]
 
-use criterion::{black_box, criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use ring::{
     rand,
     signature::{self, EcdsaKeyPair, EcdsaSigningAlgorithm, EcdsaVerificationAlgorithm, KeyPair},
 };
+use std::hint::black_box;
 
 static ALGORITHMS: &[(&str, &EcdsaSigningAlgorithm, &EcdsaVerificationAlgorithm)] = &[
     (

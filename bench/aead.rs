@@ -13,12 +13,13 @@
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #![allow(missing_docs)]
 
-use criterion::{black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion};
+use criterion::{BatchSize, BenchmarkId, Criterion, criterion_group, criterion_main};
 use ring::{
     aead::{self, BoundKey},
     error,
     rand::{SecureRandom, SystemRandom},
 };
+use std::hint::black_box;
 
 static ALGORITHMS: &[(&str, &aead::Algorithm)] = &[
     ("aes128_gcm", &aead::AES_128_GCM),

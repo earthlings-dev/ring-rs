@@ -41,9 +41,8 @@ use crate::polyfill::prelude::*;
 
 use super::{
     super::{
-        limbs512,
-        montgomery::{RInverse, Unencoded, RRR},
-        LimbSliceError,
+        LimbSliceError, limbs512,
+        montgomery::{RInverse, RRR, Unencoded},
     },
     Elem, IntoMont, Mont, One, PrivateExponent, Uninit,
 };
@@ -51,7 +50,7 @@ use crate::{
     bits::BitLength,
     cpu,
     error::LenMismatchError,
-    limb::{self, Limb, LIMB_BITS},
+    limb::{self, LIMB_BITS, Limb},
     window5::Window5,
 };
 use core::mem::MaybeUninit;
@@ -83,7 +82,7 @@ pub(crate) fn elem_exp_consttime<N, P>(
 // operation.
 const ELEM_EXP_CONSTTIME_MAX_MODULUS_LIMBS: usize = 2048 / LIMB_BITS;
 const _LIMBS_PER_CHUNK_DIVIDES_ELEM_EXP_CONSTTIME_MAX_MODULUS_LIMBS: () =
-    assert!(ELEM_EXP_CONSTTIME_MAX_MODULUS_LIMBS % limbs512::LIMBS_PER_CHUNK == 0);
+    assert!(ELEM_EXP_CONSTTIME_MAX_MODULUS_LIMBS.is_multiple_of(limbs512::LIMBS_PER_CHUNK));
 const WINDOW_BITS: u32 = 5;
 const TABLE_ENTRIES: usize = 1 << WINDOW_BITS;
 const STORAGE_ENTRIES: usize = TABLE_ENTRIES + if cfg!(target_arch = "x86_64") { 3 } else { 0 };
@@ -97,7 +96,7 @@ fn elem_exp_consttime_inner<N, M, const STORAGE_LIMBS: usize>(
     m: &Mont<M>,
     other_prime_len_bits: BitLength,
 ) -> Result<Elem<M, Unencoded>, LimbSliceError> {
-    use super::super::montgomery::{limbs_mul_mont, limbs_square_mont, R};
+    use super::super::montgomery::{R, limbs_mul_mont, limbs_square_mont};
     use crate::{bssl, c, error, polyfill::dynarray};
 
     let base_rinverse: Elem<M, RInverse> =
@@ -214,7 +213,7 @@ fn elem_exp_consttime_inner<N, M, const STORAGE_LIMBS: usize>(
     use super::{
         super::{
             limbs::x86_64::mont::{
-                gather5, mul_mont5, mul_mont_gather5_amm, power5_amm, sqr_mont5,
+                gather5, mul_mont_gather5_amm, mul_mont5, power5_amm, sqr_mont5,
             },
             limbs512::scatter::scatter5,
             montgomery::N0,
@@ -224,8 +223,8 @@ fn elem_exp_consttime_inner<N, M, const STORAGE_LIMBS: usize>(
     };
     use crate::{
         cpu::{
-            intel::{Adx, Bmi2},
             GetFeature as _,
+            intel::{Adx, Bmi2},
         },
         polyfill::{self, sliceutil::as_chunks_exact},
         window5::LeakyWindow5,
@@ -268,7 +267,7 @@ fn elem_exp_consttime_inner<N, M, const STORAGE_LIMBS: usize>(
     const _TABLE_ENTRIES_IS_32: () = assert!(TABLE_ENTRIES == 32);
     const _STORAGE_ENTRIES_HAS_3_EXTRA: () = assert!(STORAGE_ENTRIES == TABLE_ENTRIES + 3);
 
-    assert!(STORAGE_LIMBS % (STORAGE_ENTRIES * limbs512::LIMBS_PER_CHUNK) == 0); // TODO: `const`
+    assert!(STORAGE_LIMBS.is_multiple_of(STORAGE_ENTRIES * limbs512::LIMBS_PER_CHUNK)); // TODO: `const`
     let mut table = limbs512::storage::AlignedStorage::<STORAGE_LIMBS>::uninit();
     let table = table.aligned_chunks_mut(STORAGE_ENTRIES, cpe)?;
     let (table, state) = table.split_at_mut(TABLE_ENTRIES * cpe);
@@ -372,7 +371,7 @@ fn elem_exp_consttime_inner<N, M, const STORAGE_LIMBS: usize>(
 #[cfg(test)]
 mod tests {
     use super::super::elem::testutil::*;
-    use super::super::{modulus, unwrap_impossible_len_mismatch_error, PublicModulus};
+    use super::super::{PublicModulus, modulus, unwrap_impossible_len_mismatch_error};
     use super::*;
     use crate::cpu;
     use crate::testutil as test;

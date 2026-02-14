@@ -17,12 +17,12 @@
 #[allow(unused_imports)]
 use crate::polyfill::prelude::*;
 
-use crate::polyfill::{slice::Uninit, SmallerChunks, StartMutPtr};
+use crate::polyfill::{SmallerChunks, StartMutPtr, slice::Uninit};
 
 use super::super::super::{
+    LimbSliceError, MAX_LIMBS,
     limbs512::storage::{check_common, check_common_with_n, table_parts, table_parts_uninit},
     n0::N0,
-    LimbSliceError, MAX_LIMBS,
 };
 use crate::{
     c,

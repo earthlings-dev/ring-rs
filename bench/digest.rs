@@ -13,8 +13,9 @@
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #![allow(missing_docs)]
 
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use ring::digest;
+use std::hint::black_box;
 
 static ALGORITHMS: &[(&str, &digest::Algorithm)] = &[
     ("sha256", &digest::SHA256),
@@ -59,7 +60,7 @@ fn oneshot(c: &mut Criterion) {
                         &v[..]
                     };
                     b.iter(|| -> usize {
-                        let digest = digest::digest(algorithm, &input);
+                        let digest = digest::digest(algorithm, input);
                         black_box(digest.as_ref().len())
                     })
                 },

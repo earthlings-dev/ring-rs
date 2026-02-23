@@ -248,4 +248,4 @@ wasm-bindgen-test = { version = "0.3.58", default-features = false, features = [
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading"] }
 
 [patch.crates-io]
-getrandom = { git = "https://github.com/earthlings-dev/getrandom.git" }
+getrandom = { path = "../getrandom" }
